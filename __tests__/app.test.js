@@ -15,3 +15,20 @@ describe("GET /api", () => {
       });
   });
 });
+
+describe("GET /api/topics", () => {
+  test("200: Responds with an array of topic objects", () => {
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({ body: { topics } }) => {
+        expect(topics.length).toBe(3);
+        expect(topics[0]).toEqual({
+          slug: expect.any(String),
+          description: expect.any(String)
+        });
+      });
+  });
+});
+
+
