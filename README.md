@@ -1,9 +1,9 @@
-# Northcoders News API
+# Environment Variables
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+To run this project locally, you need to create two `.env` files in the root directory of the project:
 
+1. `.env.development` with the following content: PGDATABASE=nc_news
 
+2. `.env.test` with the following content: PGDATABASE=nc_news_test
 
---- 
-
-This portfolio project was created as part of a Digital Skills Bootcamp in Software Engineering provided by [Northcoders](https://northcoders.com/)
+These files are essential for connecting to the PostgreSQL databases in the development and test environments.
