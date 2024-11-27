@@ -11,7 +11,43 @@ exports.fetchArticleById = (article_id) => {
         .then((result) => {
             if (result.rows.length === 0) {
                 return Promise.reject({ status: 404, msg: 'Article not found' });
+            } else {
+                return db.query(
+                    `SELECT * FROM comments WHERE article_id = $1`,
+                    [article_id]
+                )
+                .then((commentResult) => {
+                    const article = result.rows[0];
+                    article.comment_count = commentResult.rows.length; 
+                    article.comments = commentResult.rows; 
+                    return article;
+                });
             }
-            return result.rows[0];
         });
 };
+
+
+exports.fetchArticles = () => {
+    return db.query(
+        `SELECT 
+            articles.author, 
+            articles.title, 
+            articles.article_id, 
+            articles.topic, 
+            articles.created_at, 
+            articles.votes, 
+            articles.article_img_url, 
+            COALESCE(COUNT(comments.comment_id), 0) AS comment_count
+         FROM articles
+         LEFT JOIN comments ON articles.article_id = comments.article_id
+         GROUP BY articles.article_id
+         ORDER BY articles.created_at DESC;`
+    ).then((result) => {
+        return result.rows.map((article) => {
+            article.comment_count = Number(article.comment_count);
+            return article;
+        });
+    });
+};
+
+
