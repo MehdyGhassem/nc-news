@@ -114,7 +114,6 @@ describe('GET /api/articles', () => {
       });
   });
 
-  // Test for article_id that does not exist in the database
   test('status:404, responds with an error message when article_id does not exist', () => {
     return request(app)
       .get('/api/articles/999999')
