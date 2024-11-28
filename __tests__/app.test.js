@@ -102,5 +102,61 @@ describe('GET /api/articles', () => {
           );
         });
       });
+
+      
+  });
+  test('status:400, responds with an error message when passed an invalid article_id', () => {
+    return request(app)
+      .get('/api/articles/notAnID')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Invalid article_id');
+      });
+  });
+
+  test('status:404, responds with an error message when article_id does not exist', () => {
+    return request(app)
+      .get('/api/articles/999999')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Article not found');
+      });
+  });
+});
+
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Responds with an array of comments for a valid article_id", () => {
+      return request(app)
+          .get('/api/articles/1/comments')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+              expect(comments).toBeInstanceOf(Array);
+              expect(comments.length).toBeGreaterThan(0);
+              expect(comments[0]).toHaveProperty('comment_id');
+              expect(comments[0]).toHaveProperty('votes');
+              expect(comments[0]).toHaveProperty('created_at');
+              expect(comments[0]).toHaveProperty('author');
+              expect(comments[0]).toHaveProperty('body');
+              expect(comments[0]).toHaveProperty('article_id');
+          });
+  });
+
+  test("404: Responds with a 404 error if article_id does not exist", () => {
+      return request(app)
+          .get('/api/articles/999999/comments')  
+          .expect(404)
+          .then(({ body }) => {
+              expect(body.msg).toBe('Article not found');
+          });
+  });
+
+  test("200: Responds with an empty array if no comments exist for a valid article_id", () => {
+      return request(app)
+          .get('/api/articles/2/comments')  
+          .expect(200)
+          .then(({ body: { comments } }) => {
+              expect(comments).toEqual([]);
+          });
   });
 });

@@ -5,16 +5,12 @@ exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
 
     fetchArticleById(article_id)
-        .then((article) => {
-            res.status(200).send({ article });
-        })
-        .catch((err) => {
-            if (err.code === '22P02') {  
-                res.status(400).send({ msg: 'Invalid article_id' });
-            } else {
-                next(err); 
-            }
-        });
+    .then((article) => {
+      res.status(200).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.getArticles = (req, res, next) => {
