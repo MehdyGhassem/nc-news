@@ -127,20 +127,26 @@ describe('GET /api/articles', () => {
 
 describe("GET /api/articles/:article_id/comments", () => {
   test("200: Responds with an array of comments for a valid article_id", () => {
-      return request(app)
-          .get('/api/articles/1/comments')
-          .expect(200)
-          .then(({ body: { comments } }) => {
-              expect(comments).toBeInstanceOf(Array);
-              expect(comments.length).toBeGreaterThan(0);
-              expect(comments[0]).toHaveProperty('comment_id');
-              expect(comments[0]).toHaveProperty('votes');
-              expect(comments[0]).toHaveProperty('created_at');
-              expect(comments[0]).toHaveProperty('author');
-              expect(comments[0]).toHaveProperty('body');
-              expect(comments[0]).toHaveProperty('article_id');
-          });
-  });
+    return request(app)
+    .get('/api/articles/1/comments')
+    .expect(200)
+    .then(({ body: { comments } }) => {
+      expect(comments).toBeInstanceOf(Array);
+      expect(comments.length).toBeGreaterThan(0);
+      comments.forEach((comment) => {
+        expect(comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: 1, 
+          })
+        );
+      });
+    });
+});
 
   test("404: Responds with a 404 error if article_id does not exist", () => {
       return request(app)
@@ -159,4 +165,13 @@ describe("GET /api/articles/:article_id/comments", () => {
               expect(comments).toEqual([]);
           });
   });
+  test("400: Responds with a 400 error for an invalid article_id", () => {
+    return request(app)
+      .get('/api/articles/notAnID/comments')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request');
+      });
+  });
 });
+
