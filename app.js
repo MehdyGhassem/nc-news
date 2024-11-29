@@ -1,6 +1,6 @@
 const express = require('express');
 const {getEndpoints, getTopics} = require('./controllers/topics.controller');
-const {getArticleById, getArticles} = require('./controllers/articles.controller');
+const {getArticleById, getArticles, patchArticleById} = require('./controllers/articles.controller');
 const {getCommentsByArticleId, postCommentByArticleId} = require('./controllers/comments.controller')
 
 const app = express();
@@ -15,12 +15,15 @@ app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
 
 app.post('/api/articles/:article_id/comments', postCommentByArticleId)
 
+app.patch('/api/articles/:article_id', patchArticleById)
+
+
 app.use('*', (req, res) => {
     res.status(404).send({ msg: 'Not Found' });
   });
 
-  app.use((err, req, res, next) => {
-    if (err.status && err.msg) {
+app.use((err, req, res, next) => {
+  if (err.status && err.msg) {
       return res.status(err.status).send({ msg: err.msg });
     }
   
@@ -34,6 +37,8 @@ app.use('*', (req, res) => {
   
     res.status(500).send({ msg: 'Internal Server Error' });
   });
+
+
 
 
 

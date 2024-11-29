@@ -246,3 +246,46 @@ describe('POST /api/articles/:article_id/comments', () => {
       });
   });
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Successfully updates the votes of a valid article", () => {
+      return request(app)
+          .patch('/api/articles/1')
+          .send({ inc_votes: 10 })
+          .expect(200)
+          .then(({ body: { article } }) => {
+              expect(article).toHaveProperty('article_id', 1);
+              expect(article).toHaveProperty('votes', expect.any(Number));  
+          });
+  });
+
+  test("400: Responds with an error when inc_votes is not provided", () => {
+      return request(app)
+          .patch('/api/articles/1')
+          .send({})
+          .expect(400)
+          .then(({ body }) => {
+              expect(body.msg).toBe('Missing inc_votes');
+          });
+  });
+
+  test("400: Responds with an error when inc_votes is not a valid number", () => {
+      return request(app)
+          .patch('/api/articles/1')
+          .send({ inc_votes: "invalid" })
+          .expect(400)
+          .then(({ body }) => {
+              expect(body.msg).toBe('Invalid value for votes');
+          });
+  });
+
+  test("404: Responds with an error when article_id does not exist", () => {
+      return request(app)
+          .patch('/api/articles/999999')
+          .send({ inc_votes: 10 })
+          .expect(404)
+          .then(({ body }) => {
+              expect(body.msg).toBe('Article not found');
+          });
+  });
+});
