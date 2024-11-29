@@ -27,3 +27,15 @@ exports.fetchCommentsByArticleId = (article_id) => {
             }
           });
       };
+      
+      exports.insertCommentByArticleId = (article_id, username, body) => {
+        const query = `
+          INSERT INTO comments (article_id, author, body)
+          VALUES ($1, $2, $3)
+          RETURNING comment_id, article_id, author, body, created_at, votes;
+        `;
+      
+        return db.query(query, [article_id, username, body]).then((result) => {
+          return result.rows[0];
+        });
+      };

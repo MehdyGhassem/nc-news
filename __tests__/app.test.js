@@ -175,3 +175,74 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
+describe('POST /api/articles/:article_id/comments', () => {
+  test('201: Responds with the posted comment', () => {
+    const newComment = { username: 'butter_bridge', body: 'Great article!' };
+
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(newComment)
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            article_id: 1,
+            author: 'butter_bridge',
+            body: 'Great article!',
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          })
+        );
+      });
+  });
+  
+
+  test('400: Responds with error for missing fields', () => {
+    const newComment = { username: 'butter_bridge' }; 
+
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Missing required fields: username or body');
+      });
+  });
+
+  test('404: Responds with error if article_id does not exist', () => {
+    const newComment = { username: 'mehdy_ghassemi', body: 'Nice!' };
+
+    return request(app)
+      .post('/api/articles/999999/comments')
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Article or user not found');
+      });
+  });
+
+  test('400: Responds with error for invalid article_id', () => {
+    const newComment = { username: 'mehdy_ghassem', body: 'Nice!' };
+
+    return request(app)
+      .post('/api/articles/notAnID/comments')
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Invalid article_id');
+      });
+  });
+
+  test('404: Responds with error if username does not exist', () => {
+    const newComment = { username: 'nonexistent_user', body: 'Nice!' };
+
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Article or user not found');
+      });
+  });
+});
